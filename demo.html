@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Quality-Targeted Adaptive Streaming — PoC demo</title>
+<style>
+  :root { --blue:#1F3A93; --yellow:#F5B700; --grey:#6B7280; --bg:#f7f8fa;
+          --green:#16A34A; --red:#DC2626; }
+  body { font-family: -apple-system, system-ui, Segoe UI, Roboto, sans-serif;
+         max-width: 1040px; margin: 24px auto; padding: 0 20px; color:#1a202c; background: var(--bg); }
+  h1 { color: var(--blue); margin-bottom: 4px; }
+  .sub { color: var(--grey); margin-bottom: 20px; }
+  .presets { display:flex; gap:8px; flex-wrap:wrap; margin: 14px 0 10px 0; }
+  .preset { padding:6px 12px; border-radius:16px; border:1px solid #d1d5db; cursor:pointer;
+            background:white; font-size:12px; font-weight:600; color:#374151; }
+  .preset:hover { background: var(--blue); color:white; border-color: var(--blue); }
+  .controls { display:flex; gap:12px; flex-wrap:wrap; margin: 12px 0; padding:16px;
+              background:white; border:1px solid #e5e7eb; border-radius:8px; align-items:flex-end; }
+  .controls label { font-size: 12px; color:#374151; display:block; margin-bottom:3px; font-weight: 500; }
+  .controls select, .controls input, .controls button {
+      padding: 7px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; }
+  .controls button { background: var(--blue); color:white; border:0; cursor:pointer; font-weight:600; }
+  .controls button:hover { background: #162b70; }
+  table { border-collapse: collapse; width:100%; background:white; margin-top:12px;
+          border:1px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+  th, td { padding: 9px 12px; text-align:left; border-bottom:1px solid #e5e7eb; font-size:13px;}
+  th { background: var(--blue); color:white; font-weight: 600; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .pick-row td { background: #fff9db; }
+  .explainer { background:white; padding:16px; border-radius:8px; border:1px solid #e5e7eb; margin-top:20px; }
+  code { background: #f3f4f6; padding: 2px 6px; border-radius:4px; font-size: 12px;}
+  .badge { display:inline-block; padding:2px 8px; border-radius:12px; font-size:11px;
+           background: var(--yellow); color: #1a202c; font-weight:600; margin-left:6px;}
+  .stats { display:flex; gap:20px; margin: 10px 0;
+           padding:14px 18px; background:var(--blue); color:white; border-radius:8px; }
+  .stat .lbl { font-size:11px; opacity:0.7; text-transform:uppercase; letter-spacing: 1px;}
+  .stat .val { font-size:20px; font-weight:700; color:var(--yellow); margin-top:2px;}
+</style>
+</head>
+<body>
+<h1>Quality-Targeted Adaptive Streaming</h1>
+<div class="sub">Interactive controller demo — see how picks change with device and network conditions.
+  Try the Indian-network presets below.</div>
+
+<div class="presets">
+  <strong style="color:var(--blue); align-self:center; margin-right:4px;">Presets:</strong>
+  <button class="preset" onclick="preset('phone','no',1000)">BSNL 3G rural</button>
+  <button class="preset" onclick="preset('phone','no',6800)">Airtel 4G tier-2</button>
+  <button class="preset" onclick="preset('phone','no',14500)">Jio 4G metro</button>
+  <button class="preset" onclick="preset('phone','no',3000)">Metro peak-hour</button>
+  <button class="preset" onclick="preset('phone','no',87500)">Jio 5G metro</button>
+  <button class="preset" onclick="preset('tv','no',14500)">TV on Jio 4G</button>
+  <button class="preset" onclick="preset('phone','yes',14500)">Phone + data-saver</button>
+</div>
+
+<div class="controls">
+  <div><label>Device</label>
+    <select id="device"><option>phone</option><option>tv</option></select></div>
+  <div><label>Data-saver</label>
+    <select id="dsaver"><option value="no">off</option><option value="yes">on</option></select></div>
+  <div><label>Throughput (kbps)</label>
+    <input id="tp" type="number" value="14500" style="width:100px;"></div>
+  <div><button onclick="refresh()">Recompute picks</button></div>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="lbl">Quality floor</div><div class="val" id="statFloor">—</div></div>
+  <div class="stat"><div class="lbl">Avg VMAF (device)</div><div class="val" id="statVmaf">—</div></div>
+  <div class="stat"><div class="lbl">Bytes delivered</div><div class="val" id="statBytes">—</div></div>
+  <div class="stat"><div class="lbl">Avg bitrate</div><div class="val" id="statKbps">—</div></div>
+</div>
+
+<table id="picks"></table>
+
+<div class="explainer">
+  <strong>What this does</strong><br>
+  Each row is a shot from the manifest. The controller:
+  <ol>
+    <li>Reads the device-specific VMAF floor
+       (<code>phone=68</code>, <code>tv=76</code>; data-saver lowers each).</li>
+    <li>Scales that floor down when sustained throughput is below 2.5 Mbps
+        (adaptive to the link, so we don't stall on BSNL).</li>
+    <li>Picks the rendition with the <em>fewest bytes</em> that meets the floor.</li>
+  </ol>
+  Try the Indian-network presets: <b>Jio 4G metro</b> vs <b>BSNL 3G rural</b> — you'll see
+  the floor drop and renditions shrink dramatically on BSNL while meeting a higher
+  target on Jio.
+  <span class="badge">this is the whole point</span>
+</div>
+
+<script>
+  const MANIFEST = {"version": "qtas-1.0", "comment": "Quality-Targeted Adaptive Streaming manifest.  Extends HLS/DASH with per-segment byte size and VMAF (TV/phone/NEG). Standard players ignore extra fields and still play.", "segments": [{"seg_id": 0, "shot_id": "s01", "shot_name": "Studio A", "duration_s": 4.0, "complexity": 0.3, "renditions": [{"label": "240p", "width": 426, "height": 240, "nominal_kbps": 300, "bytes": 79853, "vmaf_tv": 49.97, "vmaf_phone": 65.98, "vmaf_neg": 49.97}, {"label": "360p", "width": 640, "height": 360, "nominal_kbps": 600, "bytes": 176368, "vmaf_tv": 61.97, "vmaf_phone": 74.14, "vmaf_neg": 61.97}, {"label": "480p", "width": 854, "height": 480, "nominal_kbps": 1000, "bytes": 321658, "vmaf_tv": 70.81, "vmaf_phone": 80.15, "vmaf_neg": 70.79}, {"label": "720p", "width": 1280, "height": 720, "nominal_kbps": 2400, "bytes": 625372, "vmaf_tv": 85.97, "vmaf_phone": 90.46, "vmaf_neg": 85.49}, {"label": "1080p", "width": 1920, "height": 1080, "nominal_kbps": 4800, "bytes": 442061, "vmaf_tv": 97.97, "vmaf_phone": 98.62, "vmaf_neg": 97.13}]}, {"seg_id": 1, "shot_id": "s02", "shot_name": "Studio B", "duration_s": 4.0, "complexity": 0.35, "renditions": [{"label": "240p", "width": 426, "height": 240, "nominal_kbps": 300, "bytes": 131194, "vmaf_tv": 48.51, "vmaf_phone": 64.98, "vmaf_neg": 48.51}, {"label": "360p", "width": 640, "height": 360, "nominal_kbps": 600, "bytes": 267716, "vmaf_tv": 60.51, "vmaf_phone": 73.14, "vmaf_neg": 60.51}, {"label": "480p", "width": 854, "height": 480, "nominal_kbps": 1000, "bytes": 470400, "vmaf_tv": 69.35, "vmaf_phone": 79.16, "vmaf_neg": 69.35}, {"label": "720p", "width": 1280, "height": 720, "nominal_kbps": 2400, "bytes": 1140142, "vmaf_tv": 84.51, "vmaf_phone": 89.46, "vmaf_neg": 84.07}, {"label": "1080p", "width": 1920, "height": 1080, "nominal_kbps": 4800, "bytes": 2260469, "vmaf_tv": 96.51, "vmaf_phone": 97.62, "vmaf_neg": 95.71}]}, {"seg_id": 2, "shot_id": "s03", "shot_name": "Rally 1", "duration_s": 6.0, "complexity": 0.92, "renditions": [{"label": "240p", "width": 426, "height": 240, "nominal_kbps": 300, "bytes": 232391, "vmaf_tv": 37.17, "vmaf_phone": 57.28, "vmaf_neg": 37.17}, {"label": "360p", "width": 640, "height": 360, "nominal_kbps": 600, "bytes": 454896, "vmaf_tv": 49.17, "vmaf_phone": 65.44, "vmaf_neg": 49.17}, {"label": "480p", "width": 854, "height": 480, "nominal_kbps": 1000, "bytes": 751160, "vmaf_tv": 58.02, "vmaf_phone": 71.45, "vmaf_neg": 58.02}, {"label": "720p", "width": 1280, "height": 720, "nominal_kbps": 2400, "bytes": 1879470, "vmaf_tv": 73.17, "vmaf_phone": 81.76, "vmaf_neg": 73.08}, {"label": "1080p", "width": 1920, "height": 1080, "nominal_kbps": 4800, "bytes": 3845235, "vmaf_tv": 85.17, "vmaf_phone": 89.92, "vmaf_neg": 84.72}]}, {"seg_id": 3, "shot_id": "s04", "shot_name": "Rally 2", "duration_s": 6.0, "complexity": 0.95, "renditions": [{"label": "240p", "width": 426, "height": 240, "nominal_kbps": 300, "bytes": 242103, "vmaf_tv": 36.74, "vmaf_phone": 56.98, "vmaf_neg": 36.74}, {"label": "360p", "width": 640, "height": 360, "nominal_kbps": 600, "bytes": 488588, "vmaf_tv": 48.74, "vmaf_phone": 65.14, "vmaf_neg": 48.74}, {"label": "480p", "width": 854, "height": 480, "nominal_kbps": 1000, "bytes": 802463, "vmaf_tv": 57.59, "vmaf_phone": 71.16, "vmaf_neg": 57.59}, {"label": "720p", "width": 1280, "height": 720, "nominal_kbps": 2400, "bytes": 1939903, "vmaf_tv": 72.74, "vmaf_phone": 81.46, "vmaf_neg": 72.66}, {"label": "1080p", "width": 1920, "height": 1080, "nominal_kbps": 4800, "bytes": 3771271, "vmaf_tv": 84.74, "vmaf_phone": 89.62, "vmaf_neg": 84.3}]}, {"seg_id": 4, "shot_id": "s05", "shot_name": "Close-up", "duration_s": 6.0, "complexity": 0.55, "renditions": [{"label": "240p", "width": 426, "height": 240, "nominal_kbps": 300, "bytes": 25078, "vmaf_tv": 43.64, "vmaf_phone": 61.68, "vmaf_neg": 43.64}, {"label": "360p", "width": 640, "height": 360, "nominal_kbps": 600, "bytes": 31512, "vmaf_tv": 55.64, "vmaf_phone": 69.84, "vmaf_neg": 55.64}, {"label": "480p", "width": 854, "height": 480, "nominal_kbps": 1000, "bytes": 57507, "vmaf_tv": 64.49, "vmaf_phone": 75.85, "vmaf_neg": 64.49}, {"label": "720p", "width": 1280, "height": 720, "nominal_kbps": 2400, "bytes": 65772, "vmaf_tv": 79.64, "vmaf_phone": 86.16, "vmaf_neg": 79.35}, {"label": "1080p", "width": 1920, "height": 1080, "nominal_kbps": 4800, "bytes": 46434, "vmaf_tv": 91.64, "vmaf_phone": 94.32, "vmaf_neg": 90.99}]}, {"seg_id": 5, "shot_id": "s06", "shot_name": "Credits", "duration_s": 4.0, "complexity": 0.25, "renditions": [{"label": "240p", "width": 426, "height": 240, "nominal_kbps": 300, "bytes": 13540, "vmaf_tv": 51.57, "vmaf_phone": 67.07, "vmaf_neg": 51.57}, {"label": "360p", "width": 640, "height": 360, "nominal_kbps": 600, "bytes": 13807, "vmaf_tv": 63.57, "vmaf_phone": 75.23, "vmaf_neg": 63.57}, {"label": "480p", "width": 854, "height": 480, "nominal_kbps": 1000, "bytes": 15687, "vmaf_tv": 72.41, "vmaf_phone": 81.24, "vmaf_neg": 72.34}, {"label": "720p", "width": 1280, "height": 720, "nominal_kbps": 2400, "bytes": 14477, "vmaf_tv": 87.57, "vmaf_phone": 91.55, "vmaf_neg": 87.04}, {"label": "1080p", "width": 1920, "height": 1080, "nominal_kbps": 4800, "bytes": 14109, "vmaf_tv": 99, "vmaf_phone": 99.32, "vmaf_neg": 98.13}]}]};
+
+  function preset(device, dsaver, kbps) {
+    document.getElementById("device").value = device;
+    document.getElementById("dsaver").value = dsaver;
+    document.getElementById("tp").value = kbps;
+    refresh();
+  }
+
+  function baseFloor(device, dsaver) {
+    if (dsaver === "yes") return device === "phone" ? 55 : 65;
+    return device === "phone" ? 68 : 76;
+  }
+  function adaptiveFloor(base, tp) {
+    if (tp >= 2500) return base;
+    const scale = Math.max(0.2, (tp - 200) / 2300);
+    return 38 + (base - 38) * scale;
+  }
+  function vmafFor(r, device) {
+    return device === "phone" ? r.vmaf_phone : r.vmaf_tv;
+  }
+
+  function refresh() {
+    const device = document.getElementById("device").value;
+    const dsaver = document.getElementById("dsaver").value;
+    const tp     = Number(document.getElementById("tp").value);
+    const base   = baseFloor(device, dsaver);
+    const floor  = adaptiveFloor(base, tp);
+
+    const tbl = document.getElementById("picks");
+    tbl.innerHTML = "<tr><th>Shot</th><th>Complexity</th>" +
+                    "<th>Pick</th><th class='num'>KiB</th>" +
+                    "<th class='num'>VMAF (device)</th>" +
+                    "<th>Why</th></tr>";
+    let totalBytes = 0, floorSum = 0;
+    for (const seg of MANIFEST.segments) {
+      const sorted = [...seg.renditions].sort((a,b) => a.bytes - b.bytes);
+      let pick = sorted[sorted.length - 1];
+      let why = "fallback top";
+      for (const r of sorted) {
+        if (vmafFor(r, device) >= floor) { pick = r; why = `meets floor ${floor.toFixed(1)}`; break; }
+      }
+      totalBytes += pick.bytes;
+      floorSum += vmafFor(pick, device) * seg.duration_s;
+      tbl.innerHTML += `<tr class="pick-row"><td>${seg.shot_name}</td>
+                        <td>${seg.complexity}</td>
+                        <td>${pick.label} (${pick.nominal_kbps} kbps)</td>
+                        <td class='num'>${Math.round(pick.bytes/1024)}</td>
+                        <td class='num'>${vmafFor(pick, device).toFixed(1)}</td>
+                        <td>${why}</td></tr>`;
+    }
+    const durSum = MANIFEST.segments.reduce((a,s)=>a+s.duration_s, 0);
+    const avgV = floorSum / durSum;
+    const avgKbps = (totalBytes * 8 / 1000) / durSum;
+    document.getElementById("statFloor").innerText = floor.toFixed(1);
+    document.getElementById("statVmaf").innerText  = avgV.toFixed(1);
+    document.getElementById("statBytes").innerText = (totalBytes/1024/1024).toFixed(2) + " MiB";
+    document.getElementById("statKbps").innerText  = avgKbps.toFixed(0) + " kbps";
+  }
+  refresh();
+</script>
+</body>
+</html>

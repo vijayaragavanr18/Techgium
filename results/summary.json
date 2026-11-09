@@ -1,0 +1,162 @@
+{
+  "phone/belgium_4g": {
+    "baseline_A_MiB": 4.882,
+    "ours_D_MiB": 1.856,
+    "pct_bytes_saved": 61.98,
+    "baseline_A_VMAF_NEG": 74.5,
+    "ours_D_VMAF_NEG": 57.46,
+    "delta_VMAF_NEG": -17.04,
+    "baseline_A_rebuffer_s": 0.0,
+    "ours_D_rebuffer_s": 0.0
+  },
+  "phone/norway_3g": {
+    "baseline_A_MiB": 1.268,
+    "ours_D_MiB": 0.691,
+    "pct_bytes_saved": 45.5,
+    "baseline_A_VMAF_NEG": 51.52,
+    "ours_D_VMAF_NEG": 43.52,
+    "delta_VMAF_NEG": -8.0,
+    "baseline_A_rebuffer_s": 0.766,
+    "ours_D_rebuffer_s": 0.0
+  },
+  "phone/sudden_drop": {
+    "baseline_A_MiB": 2.076,
+    "ours_D_MiB": 1.144,
+    "pct_bytes_saved": 44.89,
+    "baseline_A_VMAF_NEG": 61.57,
+    "ours_D_VMAF_NEG": 50.72,
+    "delta_VMAF_NEG": -10.85,
+    "baseline_A_rebuffer_s": 0.0,
+    "ours_D_rebuffer_s": 0.0
+  },
+  "phone/jio_4g_metro": {
+    "baseline_A_MiB": 9.553,
+    "ours_D_MiB": 1.856,
+    "pct_bytes_saved": 80.57,
+    "baseline_A_VMAF_NEG": 84.51,
+    "ours_D_VMAF_NEG": 57.46,
+    "delta_VMAF_NEG": -27.05,
+    "baseline_A_rebuffer_s": 0.0,
+    "ours_D_rebuffer_s": 0.0
+  },
+  "phone/airtel_4g_tier2": {
+    "baseline_A_MiB": 9.553,
+    "ours_D_MiB": 1.856,
+    "pct_bytes_saved": 80.57,
+    "baseline_A_VMAF_NEG": 84.51,
+    "ours_D_VMAF_NEG": 57.46,
+    "delta_VMAF_NEG": -27.05,
+    "baseline_A_rebuffer_s": 0.0,
+    "ours_D_rebuffer_s": 0.0
+  },
+  "phone/bsnl_3g_rural": {
+    "baseline_A_MiB": 2.051,
+    "ours_D_MiB": 0.903,
+    "pct_bytes_saved": 55.97,
+    "baseline_A_VMAF_NEG": 59.8,
+    "ours_D_VMAF_NEG": 45.92,
+    "delta_VMAF_NEG": -13.88,
+    "baseline_A_rebuffer_s": 3.352,
+    "ours_D_rebuffer_s": 0.0
+  },
+  "phone/metro_peak_hour": {
+    "baseline_A_MiB": 9.553,
+    "ours_D_MiB": 1.856,
+    "pct_bytes_saved": 80.57,
+    "baseline_A_VMAF_NEG": 84.51,
+    "ours_D_VMAF_NEG": 57.46,
+    "delta_VMAF_NEG": -27.05,
+    "baseline_A_rebuffer_s": 0.0,
+    "ours_D_rebuffer_s": 0.0
+  },
+  "phone/jio_5g_metro": {
+    "baseline_A_MiB": 9.553,
+    "ours_D_MiB": 1.856,
+    "pct_bytes_saved": 80.57,
+    "baseline_A_VMAF_NEG": 84.51,
+    "ours_D_VMAF_NEG": 57.46,
+    "delta_VMAF_NEG": -27.05,
+    "baseline_A_rebuffer_s": 0.0,
+    "ours_D_rebuffer_s": 0.0
+  },
+  "tv/belgium_4g": {
+    "baseline_A_MiB": 4.882,
+    "ours_D_MiB": 8.485,
+    "pct_bytes_saved": -73.8,
+    "baseline_A_VMAF_NEG": 74.5,
+    "ours_D_VMAF_NEG": 82.96,
+    "delta_VMAF_NEG": 8.46,
+    "baseline_A_rebuffer_s": 0.0,
+    "ours_D_rebuffer_s": 3.972
+  },
+  "tv/norway_3g": {
+    "baseline_A_MiB": 1.268,
+    "ours_D_MiB": 1.144,
+    "pct_bytes_saved": 9.78,
+    "baseline_A_VMAF_NEG": 51.52,
+    "ours_D_VMAF_NEG": 50.72,
+    "delta_VMAF_NEG": -0.8,
+    "baseline_A_rebuffer_s": 0.766,
+    "ours_D_rebuffer_s": 0.0
+  },
+  "tv/sudden_drop": {
+    "baseline_A_MiB": 2.076,
+    "ours_D_MiB": 4.225,
+    "pct_bytes_saved": -103.52,
+    "baseline_A_VMAF_NEG": 61.57,
+    "ours_D_VMAF_NEG": 76.34,
+    "delta_VMAF_NEG": 14.77,
+    "baseline_A_rebuffer_s": 0.0,
+    "ours_D_rebuffer_s": 1.525
+  },
+  "tv/jio_4g_metro": {
+    "baseline_A_MiB": 9.553,
+    "ours_D_MiB": 8.485,
+    "pct_bytes_saved": 11.18,
+    "baseline_A_VMAF_NEG": 84.51,
+    "ours_D_VMAF_NEG": 82.96,
+    "delta_VMAF_NEG": -1.55,
+    "baseline_A_rebuffer_s": 0.0,
+    "ours_D_rebuffer_s": 0.0
+  },
+  "tv/airtel_4g_tier2": {
+    "baseline_A_MiB": 9.553,
+    "ours_D_MiB": 8.485,
+    "pct_bytes_saved": 11.18,
+    "baseline_A_VMAF_NEG": 84.51,
+    "ours_D_VMAF_NEG": 82.96,
+    "delta_VMAF_NEG": -1.55,
+    "baseline_A_rebuffer_s": 0.0,
+    "ours_D_rebuffer_s": 0.0
+  },
+  "tv/bsnl_3g_rural": {
+    "baseline_A_MiB": 2.051,
+    "ours_D_MiB": 1.255,
+    "pct_bytes_saved": 38.81,
+    "baseline_A_VMAF_NEG": 59.8,
+    "ours_D_VMAF_NEG": 51.1,
+    "delta_VMAF_NEG": -8.7,
+    "baseline_A_rebuffer_s": 3.352,
+    "ours_D_rebuffer_s": 0.0
+  },
+  "tv/metro_peak_hour": {
+    "baseline_A_MiB": 9.553,
+    "ours_D_MiB": 8.485,
+    "pct_bytes_saved": 11.18,
+    "baseline_A_VMAF_NEG": 84.51,
+    "ours_D_VMAF_NEG": 82.96,
+    "delta_VMAF_NEG": -1.55,
+    "baseline_A_rebuffer_s": 0.0,
+    "ours_D_rebuffer_s": 0.0
+  },
+  "tv/jio_5g_metro": {
+    "baseline_A_MiB": 9.553,
+    "ours_D_MiB": 8.485,
+    "pct_bytes_saved": 11.18,
+    "baseline_A_VMAF_NEG": 84.51,
+    "ours_D_VMAF_NEG": 82.96,
+    "delta_VMAF_NEG": -1.55,
+    "baseline_A_rebuffer_s": 0.0,
+    "ours_D_rebuffer_s": 0.0
+  }
+}

@@ -1,0 +1,360 @@
+{
+  "version": "qtas-1.0",
+  "comment": "Quality-Targeted Adaptive Streaming manifest.  Extends HLS/DASH with per-segment byte size and VMAF (TV/phone/NEG). Standard players ignore extra fields and still play.",
+  "segments": [
+    {
+      "seg_id": 0,
+      "shot_id": "s01",
+      "shot_name": "Studio A",
+      "duration_s": 4.0,
+      "complexity": 0.3,
+      "renditions": [
+        {
+          "label": "240p",
+          "width": 426,
+          "height": 240,
+          "nominal_kbps": 300,
+          "bytes": 79853,
+          "vmaf_tv": 49.97,
+          "vmaf_phone": 65.98,
+          "vmaf_neg": 49.97
+        },
+        {
+          "label": "360p",
+          "width": 640,
+          "height": 360,
+          "nominal_kbps": 600,
+          "bytes": 176368,
+          "vmaf_tv": 61.97,
+          "vmaf_phone": 74.14,
+          "vmaf_neg": 61.97
+        },
+        {
+          "label": "480p",
+          "width": 854,
+          "height": 480,
+          "nominal_kbps": 1000,
+          "bytes": 321658,
+          "vmaf_tv": 70.81,
+          "vmaf_phone": 80.15,
+          "vmaf_neg": 70.79
+        },
+        {
+          "label": "720p",
+          "width": 1280,
+          "height": 720,
+          "nominal_kbps": 2400,
+          "bytes": 625372,
+          "vmaf_tv": 85.97,
+          "vmaf_phone": 90.46,
+          "vmaf_neg": 85.49
+        },
+        {
+          "label": "1080p",
+          "width": 1920,
+          "height": 1080,
+          "nominal_kbps": 4800,
+          "bytes": 442061,
+          "vmaf_tv": 97.97,
+          "vmaf_phone": 98.62,
+          "vmaf_neg": 97.13
+        }
+      ]
+    },
+    {
+      "seg_id": 1,
+      "shot_id": "s02",
+      "shot_name": "Studio B",
+      "duration_s": 4.0,
+      "complexity": 0.35,
+      "renditions": [
+        {
+          "label": "240p",
+          "width": 426,
+          "height": 240,
+          "nominal_kbps": 300,
+          "bytes": 131194,
+          "vmaf_tv": 48.51,
+          "vmaf_phone": 64.98,
+          "vmaf_neg": 48.51
+        },
+        {
+          "label": "360p",
+          "width": 640,
+          "height": 360,
+          "nominal_kbps": 600,
+          "bytes": 267716,
+          "vmaf_tv": 60.51,
+          "vmaf_phone": 73.14,
+          "vmaf_neg": 60.51
+        },
+        {
+          "label": "480p",
+          "width": 854,
+          "height": 480,
+          "nominal_kbps": 1000,
+          "bytes": 470400,
+          "vmaf_tv": 69.35,
+          "vmaf_phone": 79.16,
+          "vmaf_neg": 69.35
+        },
+        {
+          "label": "720p",
+          "width": 1280,
+          "height": 720,
+          "nominal_kbps": 2400,
+          "bytes": 1140142,
+          "vmaf_tv": 84.51,
+          "vmaf_phone": 89.46,
+          "vmaf_neg": 84.07
+        },
+        {
+          "label": "1080p",
+          "width": 1920,
+          "height": 1080,
+          "nominal_kbps": 4800,
+          "bytes": 2260469,
+          "vmaf_tv": 96.51,
+          "vmaf_phone": 97.62,
+          "vmaf_neg": 95.71
+        }
+      ]
+    },
+    {
+      "seg_id": 2,
+      "shot_id": "s03",
+      "shot_name": "Rally 1",
+      "duration_s": 6.0,
+      "complexity": 0.92,
+      "renditions": [
+        {
+          "label": "240p",
+          "width": 426,
+          "height": 240,
+          "nominal_kbps": 300,
+          "bytes": 232391,
+          "vmaf_tv": 37.17,
+          "vmaf_phone": 57.28,
+          "vmaf_neg": 37.17
+        },
+        {
+          "label": "360p",
+          "width": 640,
+          "height": 360,
+          "nominal_kbps": 600,
+          "bytes": 454896,
+          "vmaf_tv": 49.17,
+          "vmaf_phone": 65.44,
+          "vmaf_neg": 49.17
+        },
+        {
+          "label": "480p",
+          "width": 854,
+          "height": 480,
+          "nominal_kbps": 1000,
+          "bytes": 751160,
+          "vmaf_tv": 58.02,
+          "vmaf_phone": 71.45,
+          "vmaf_neg": 58.02
+        },
+        {
+          "label": "720p",
+          "width": 1280,
+          "height": 720,
+          "nominal_kbps": 2400,
+          "bytes": 1879470,
+          "vmaf_tv": 73.17,
+          "vmaf_phone": 81.76,
+          "vmaf_neg": 73.08
+        },
+        {
+          "label": "1080p",
+          "width": 1920,
+          "height": 1080,
+          "nominal_kbps": 4800,
+          "bytes": 3845235,
+          "vmaf_tv": 85.17,
+          "vmaf_phone": 89.92,
+          "vmaf_neg": 84.72
+        }
+      ]
+    },
+    {
+      "seg_id": 3,
+      "shot_id": "s04",
+      "shot_name": "Rally 2",
+      "duration_s": 6.0,
+      "complexity": 0.95,
+      "renditions": [
+        {
+          "label": "240p",
+          "width": 426,
+          "height": 240,
+          "nominal_kbps": 300,
+          "bytes": 242103,
+          "vmaf_tv": 36.74,
+          "vmaf_phone": 56.98,
+          "vmaf_neg": 36.74
+        },
+        {
+          "label": "360p",
+          "width": 640,
+          "height": 360,
+          "nominal_kbps": 600,
+          "bytes": 488588,
+          "vmaf_tv": 48.74,
+          "vmaf_phone": 65.14,
+          "vmaf_neg": 48.74
+        },
+        {
+          "label": "480p",
+          "width": 854,
+          "height": 480,
+          "nominal_kbps": 1000,
+          "bytes": 802463,
+          "vmaf_tv": 57.59,
+          "vmaf_phone": 71.16,
+          "vmaf_neg": 57.59
+        },
+        {
+          "label": "720p",
+          "width": 1280,
+          "height": 720,
+          "nominal_kbps": 2400,
+          "bytes": 1939903,
+          "vmaf_tv": 72.74,
+          "vmaf_phone": 81.46,
+          "vmaf_neg": 72.66
+        },
+        {
+          "label": "1080p",
+          "width": 1920,
+          "height": 1080,
+          "nominal_kbps": 4800,
+          "bytes": 3771271,
+          "vmaf_tv": 84.74,
+          "vmaf_phone": 89.62,
+          "vmaf_neg": 84.3
+        }
+      ]
+    },
+    {
+      "seg_id": 4,
+      "shot_id": "s05",
+      "shot_name": "Close-up",
+      "duration_s": 6.0,
+      "complexity": 0.55,
+      "renditions": [
+        {
+          "label": "240p",
+          "width": 426,
+          "height": 240,
+          "nominal_kbps": 300,
+          "bytes": 25078,
+          "vmaf_tv": 43.64,
+          "vmaf_phone": 61.68,
+          "vmaf_neg": 43.64
+        },
+        {
+          "label": "360p",
+          "width": 640,
+          "height": 360,
+          "nominal_kbps": 600,
+          "bytes": 31512,
+          "vmaf_tv": 55.64,
+          "vmaf_phone": 69.84,
+          "vmaf_neg": 55.64
+        },
+        {
+          "label": "480p",
+          "width": 854,
+          "height": 480,
+          "nominal_kbps": 1000,
+          "bytes": 57507,
+          "vmaf_tv": 64.49,
+          "vmaf_phone": 75.85,
+          "vmaf_neg": 64.49
+        },
+        {
+          "label": "720p",
+          "width": 1280,
+          "height": 720,
+          "nominal_kbps": 2400,
+          "bytes": 65772,
+          "vmaf_tv": 79.64,
+          "vmaf_phone": 86.16,
+          "vmaf_neg": 79.35
+        },
+        {
+          "label": "1080p",
+          "width": 1920,
+          "height": 1080,
+          "nominal_kbps": 4800,
+          "bytes": 46434,
+          "vmaf_tv": 91.64,
+          "vmaf_phone": 94.32,
+          "vmaf_neg": 90.99
+        }
+      ]
+    },
+    {
+      "seg_id": 5,
+      "shot_id": "s06",
+      "shot_name": "Credits",
+      "duration_s": 4.0,
+      "complexity": 0.25,
+      "renditions": [
+        {
+          "label": "240p",
+          "width": 426,
+          "height": 240,
+          "nominal_kbps": 300,
+          "bytes": 13540,
+          "vmaf_tv": 51.57,
+          "vmaf_phone": 67.07,
+          "vmaf_neg": 51.57
+        },
+        {
+          "label": "360p",
+          "width": 640,
+          "height": 360,
+          "nominal_kbps": 600,
+          "bytes": 13807,
+          "vmaf_tv": 63.57,
+          "vmaf_phone": 75.23,
+          "vmaf_neg": 63.57
+        },
+        {
+          "label": "480p",
+          "width": 854,
+          "height": 480,
+          "nominal_kbps": 1000,
+          "bytes": 15687,
+          "vmaf_tv": 72.41,
+          "vmaf_phone": 81.24,
+          "vmaf_neg": 72.34
+        },
+        {
+          "label": "720p",
+          "width": 1280,
+          "height": 720,
+          "nominal_kbps": 2400,
+          "bytes": 14477,
+          "vmaf_tv": 87.57,
+          "vmaf_phone": 91.55,
+          "vmaf_neg": 87.04
+        },
+        {
+          "label": "1080p",
+          "width": 1920,
+          "height": 1080,
+          "nominal_kbps": 4800,
+          "bytes": 14109,
+          "vmaf_tv": 99,
+          "vmaf_phone": 99.32,
+          "vmaf_neg": 98.13
+        }
+      ]
+    }
+  ]
+}
