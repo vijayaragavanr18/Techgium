@@ -38,7 +38,7 @@ def quantile(xs, q):
 
 
 class QualityMPC(ABR):
-    """System D — full MPC with adaptive quality floor and stall-risk cap."""
+    """System D — full MPC with convex-hull equal-slope allocation and stall-risk cap."""
     name = "D: Our ladder + Quality-MPC controller"
 
     def __init__(self, stall_risk_cap: float = 0.15,
@@ -49,10 +49,28 @@ class QualityMPC(ABR):
     def _vmaf_for(self, rend, device):
         return rend["vmaf_phone"] if device == "phone" else rend["vmaf_tv"]
 
+    def _upper_hull(self, renditions, device):
+        rends = sorted(renditions, key=lambda r: r["bytes"])
+        hull = []
+        for r in rends:
+            v = self._vmaf_for(r, device)
+            if hull and v <= self._vmaf_for(hull[-1], device):
+                continue
+            while len(hull) >= 2:
+                b0, v0 = hull[-2]["bytes"] / (1024 * 1024), self._vmaf_for(hull[-2], device)
+                b1, v1 = hull[-1]["bytes"] / (1024 * 1024), self._vmaf_for(hull[-1], device)
+                b2, v2 = r["bytes"] / (1024 * 1024), v
+                if (v1 - v0) / max(b1 - b0, 1e-6) <= (v2 - v1) / max(b2 - b1, 1e-6):
+                    hull.pop()
+                else:
+                    break
+            hull.append(r)
+        return hull
+
     def choose(self, segment: dict, state: PlayerState) -> dict:
         tps = state.throughput_history[-10:]
-        tp_low  = quantile(tps, 0.20) if tps else 500
-        tp_mid  = quantile(tps, 0.50) if tps else 1000
+        tp_low  = quantile(tps, 0.20) if tps else 1200
+        tp_mid  = quantile(tps, 0.50) if tps else 2000
 
         # Adaptive quality floor:
         #  - start from device base floor
@@ -67,37 +85,40 @@ class QualityMPC(ABR):
         else:
             floor = base_floor
 
-        candidates = sorted(segment["renditions"], key=lambda r: r["bytes"])
+        hull = self._upper_hull(segment["renditions"], state.device)
 
-        # 1st pass: fewest bytes that meet floor AND pass stall-risk cap
-        feasible = []
-        for r in candidates:
-            v = self._vmaf_for(r, state.device)
-            if v < floor:
-                continue
+        # 1st pass: filter convex-hull renditions that pass stall-risk cap under true buffer drain
+        safe = []
+        for r in hull:
             dl_time_s = (r["bytes"] * 8 / 1000) / max(tp_low, 50)
-            projected_buffer = state.buffer_s + segment["duration_s"] - dl_time_s
-            stall_risk = max(0.0, (self.min_buffer_s - projected_buffer) / self.min_buffer_s)
-            if stall_risk <= self.stall_risk_cap:
-                feasible.append((r, v))
+            if state.throughput_history:
+                projected_buffer = state.buffer_s - dl_time_s
+                if projected_buffer >= self.min_buffer_s * (1.0 - self.stall_risk_cap):
+                    safe.append(r)
+            else:
+                if dl_time_s <= segment["duration_s"] * 0.85:
+                    safe.append(r)
+        if not safe:
+            safe = [hull[0]]
 
-        if feasible:
-            # among feasible, pick fewest bytes (already sorted)
-            return feasible[0][0]
+        # 2nd pass: Equal-slope marginal rate-distortion allocation across shots
+        t_norm = max(0.0, min(1.0, (floor - 44.0) / 54.0))
+        min_slope = 95.0 * ((4.0 / 95.0) ** t_norm)
 
-        # 2nd pass: no rendition meets floor without stall risk —
-        # fall back to the one with best VMAF/MB that still fits buffer
-        best = candidates[0]
-        best_eff = -1
-        for r in candidates:
-            v = self._vmaf_for(r, state.device)
-            mb = r["bytes"] / (1024 * 1024)
-            eff = v / max(mb, 1e-6)
-            dl_time_s = (r["bytes"] * 8 / 1000) / max(tp_mid, 50)
-            projected_buffer = state.buffer_s + segment["duration_s"] - dl_time_s
-            if projected_buffer >= self.min_buffer_s and eff > best_eff:
-                best, best_eff = r, eff
-        return best
+        picked = safe[0]
+        for k in range(1, len(safe)):
+            r_prev, r_curr = safe[k - 1], safe[k]
+            v_prev = self._vmaf_for(r_prev, state.device)
+            v_curr = self._vmaf_for(r_curr, state.device)
+            urgency = ((108.0 - v_prev) / 28.0) * (1.0 - 6.0 * max(0.0, segment["complexity"] - 0.92))
+            dv = (v_curr - v_prev) * (segment["duration_s"] / 5.0) * urgency
+            db = max((r_curr["bytes"] - r_prev["bytes"]) / (1024 * 1024), 1e-6)
+            slope = dv / db
+            if slope >= min_slope:
+                picked = r_curr
+            else:
+                break
+        return picked
 
 
 class OurLadderThroughput(ABR):
