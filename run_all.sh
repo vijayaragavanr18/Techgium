@@ -11,23 +11,26 @@ else
     PYTHON="python"
 fi
 
-echo "==[1/6]== Generate content (FFmpeg, 6 shots)"
+echo "==[1/7]== Generate content (FFmpeg, 6 shots)"
 "$PYTHON" 01_generate_content.py
 
-echo "==[2/6]== Encode ladder (6 shots x 5 renditions)"
+echo "==[2/7]== Encode ladder (6 shots x 5 renditions)"
 "$PYTHON" 02_encode_ladder.py
 
-echo "==[3/6]== Build QTAS manifest"
+echo "==[3/7]== Build QTAS manifest"
 "$PYTHON" 03_build_manifest.py
 
-echo "==[4/6]== Simulate A/B/C/D across 8 traces x 2 devices"
+echo "==[4/7]== Simulate A/B/C/D across 8 traces x 2 devices"
 "$PYTHON" 04_simulate_abr.py
 
-echo "==[5/6]== Charts + headline"
+echo "==[5/7]== Charts + headline"
 "$PYTHON" 05_plot_results.py
 
-echo "==[6/6]== Trace visualization"
+echo "==[6/7]== Trace visualization"
 "$PYTHON" 06_plot_traces.py
+
+echo "==[7/7]== Equal-quality check + Pareto frontier"
+"$PYTHON" 07_equal_quality.py
 
 echo "==== Bake fresh manifest into demo.html ===="
 "$PYTHON" -c "
@@ -44,7 +47,8 @@ print('demo.html: fresh manifest baked in')
 
 echo
 echo "DONE."
-echo "  results/results.csv    — full table"
-echo "  results/headline.md    — key numbers"
-echo "  charts/*.png           — 6 charts"
-echo "  demo.html              — interactive controller demo"
+echo "  results/results.csv       — full table"
+echo "  results/headline.md       — key numbers"
+echo "  results/equal_quality.md  — equal-quality check"
+echo "  charts/*.png              — 7 charts"
+echo "  demo.html                 — interactive controller demo"
